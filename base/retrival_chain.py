@@ -20,7 +20,15 @@ docs = loader.load()
 # 第三步：文本拆分，文本Vector化
 text_splitter = RecursiveCharacterTextSplitter()
 documents = text_splitter.split_documents(docs)
+# 使用 FAISS 将文档转化为向量，并创建一个向量数据库
+# documents 是之前通过文本分割器得到的一组较小的文本片段。
+# embeddings 是一个嵌入模型，用于将文本片段转换为向量表示。在这里，使用的是 OllamaEmbeddings 模型
 vector = FAISS.from_documents(documents, embeddings)
+"""
+from_documents 方法会对 documents 进行迭代，使用 embeddings 模型将每个文档转换为向量。
+然后，这些向量被添加到一个 FAISS 索引中，构建一个向量数据库。
+最后，这个向量数据库存储在 vector 变量中，可以用于后续的相似性搜索和检索任务。
+"""
 
 # 第四步：准备Prompt，创建文档处理的LLMChain，检索Chain
 prompt = ChatPromptTemplate.from_template("""Answer the following question based only on the provided context:
@@ -29,9 +37,14 @@ prompt = ChatPromptTemplate.from_template("""Answer the following question based
 </context>
 Question: {input}""")
 
+# 创建处理文档链式调用
 document_chain = create_stuff_documents_chain(llm, prompt)
+
+# 将向量数据库转换为一个检索器对象，执行相似性搜索和文档检索操作
 retriever = vector.as_retriever()
-retrieval_chain = create_retrieval_chain(retriever, document_chain) #建立检索
+
+# 检索链条，用于结合向量检索和文档处理
+retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
 # 第五步：代码执行与测试
 response2 = document_chain.invoke({
