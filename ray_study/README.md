@@ -26,6 +26,12 @@ ray启动的时候，如果是本地模式，会默认启动一个主节点，
 
 启动worker节点：`ray start --address=192.168.44.130:63790`
 
+window 操作系统作为worker节点：
+```bash
+set RAY_ENABLE_WINDOWS_OR_OSX_CLUSTER=1
+ray start --address=192.168.44.130:63790
+```
+
 如果不指定端口，默认是6379。
 > 在 Ray 中，您不需要单独安装 Redis，因为 Ray 自带了一个内置的 Redis 实现。Ray 的 gcs_server（Global Control Store Server）使用这个内置的 Redis 作为其后端存储来管理集群的状态和元数据。
 

@@ -16,7 +16,8 @@ def get_ip_address():
             for link in addresses[netifaces.AF_INET]:
                 ip_address = link['addr']
                 # 排除回环地址和 Docker 的 IP 地址（通常以 172 开头）
-                if not ip_address.startswith("127.0") and not ip_address.startswith("172."):
+                # if not ip_address.startswith("127.0") and not ip_address.startswith("172."):
+                if ip_address.startswith("192.168.44"):
                     ipv4_addresses.append(ip_address)
 
     return ipv4_addresses
@@ -24,7 +25,7 @@ def get_ip_address():
 
 # 启动 Ray 集群
 ray.init(
-    # address="192.168.44.130:63790",
+    address="192.168.44.130:63790",
     _node_ip_address=get_ip_address()[0],  # 指定本机 IP
     ignore_reinit_error=True,
     runtime_env={"env_vars": {"RAY_DEDUP_LOGS": "0"}},
