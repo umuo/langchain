@@ -7,7 +7,7 @@ llm_config = {
     'model_server': 'ollama',
     'host': '10.118.21.135'
 }
-function_list = ['MyRenewInstance']
+function_list = ['my_ecs_new_instance']
 bot = RolePlay(llm=llm_config,
                function_list=function_list,
                instruction=role_template)

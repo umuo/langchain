@@ -2,4 +2,8 @@
 """
 工具列表
 """
-from .ecs_tools import MyAliyunRenewInstanceTool
+from .my_ecs_new_instance import MyAliyunRenewInstanceTool
+
+_import_structure = {
+    "my_ecs_new_instance": ["MyAliyunRenewInstanceTool"]
+}

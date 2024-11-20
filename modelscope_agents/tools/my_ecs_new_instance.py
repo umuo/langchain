@@ -1,18 +1,14 @@
 # --coding: utf-8--
 from modelscope_agent.tools.base import BaseTool, register_tool
-
-import os
-import sys
-
-# 原始工作目录假设为 modelscope_agents
-os.chdir('modelscope_agents/tools')  # 现在工作目录变为 modelscope_agents/tools
-sys.path.append('../../') # 将父目录的父目录（即当前目录的爷爷目录）添加到 sys.path 列表中。
+"""
+自定义tools，使用的时候暂时还是有问题，只能在源码中改才能生效
+"""
 
 
-@register_tool('MyRenewInstance')
+@register_tool('my_ecs_new_instance')
 class MyAliyunRenewInstanceTool(BaseTool):
     description = '续费一台包年包月的ECS实例'
-    name = 'MyRenewInstance'
+    name = 'my_ecs_new_instance'
     parameters = [
         {
             'name': 'instance_id',
