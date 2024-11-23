@@ -47,7 +47,10 @@ PUT image-index
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 0
+    "number_of_replicas": 0,
+    "index": {
+      "knn": true
+    }
   },
   "mappings": {
     "properties": {
@@ -84,4 +87,8 @@ PUT image-index
 
 ### 图片文字转向量检索
 
+## 总结
+总共测试两个模型向量化，检索的前两个结果还是很明显的，后面的就不太匹配了。
+还需要多找些样本测试。
 
+https://github.com/OFA-Sys/Chinese-CLIP
