@@ -23,7 +23,10 @@ curl -X PUT "http://localhost:9200/image-index" -H 'Content-Type: application/js
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 0
+    "number_of_replicas": 0,
+    "index": {
+      "knn": true
+    }
   },
   "mappings": {
     "properties": {
