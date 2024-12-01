@@ -1,17 +1,42 @@
+from idlelib.help_about import version
+
 from opensearchpy import OpenSearch
 import numpy as np
 from PIL import Image
 import torch
 
-import cn_clip.clip as clip
-from cn_clip.clip import load_from_name, available_models
+import onnxruntime
+import cn_clip
+from cn_clip.clip.utils import image_transform, _MODEL_INFO
 
-print("Available models:", available_models())
-# Available models: ['ViT-B-16', 'ViT-L-14', 'ViT-L-14-336', 'ViT-H-14', 'RN50']
+from picture_search.pic_text_similar import text_features
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = load_from_name("ViT-B-16", device=device, download_root='./')
-model.eval()
+# 载入ONNX图形侧模型
+img_sess_option = onnxruntime.SessionOptions()
+img_run_options = onnxruntime.RunOptions()
+img_run_options.log_severity_level = 2
+img_onnx_model_path = "/media/gitsilence/develop/PythonProject/Chinese-CLIP/cn_clip/deploy/vit-b-16.img.fp32.onnx"
+img_session = onnxruntime.InferenceSession(
+    img_onnx_model_path,
+    sess_options=img_sess_option,
+    providers=["CUDAExecutionProvider"]
+)
+
+# 载入ONNX文本侧模型
+txt_sess_option = onnxruntime.SessionOptions()
+txt_run_options = onnxruntime.RunOptions()
+txt_run_options.log_severity_level = 2
+txt_onnx_model_path = "/media/gitsilence/develop/PythonProject/Chinese-CLIP/cn_clip/deploy/vit-b-16.txt.fp32.onnx"
+txt_session = onnxruntime.InferenceSession(
+    txt_onnx_model_path,
+    sess_options=txt_sess_option,
+    providers=["CUDAExecutionProvider"]
+)
+
+
+model_arch = "ViT-B-16"
+preprocess = image_transform(_MODEL_INFO[model_arch]['input_resolution'])
+
 
 # 初始化 OpenSearch 客户端
 client = OpenSearch(
@@ -27,12 +52,18 @@ index_name = "image-index"
 
 def extract_image_features(image_path):
     """提取图片特征向量"""
-    image = Image.open(image_path).convert("RGB")
-    inputs = preprocess(image).unsqueeze(0).to(device)
-    image_features = model.encode_image(inputs)
-    image_features /= image_features.norm(dim=-1, keepdim=True)
-    return image_features.detach().squeeze().cpu().numpy().astype(float).tolist()
+    # 预处理图片
+    image = preprocess(Image.open(image_path)).unsqueeze(0)
 
+    # 使用 ONNX 模型计算图像特征
+    image_features = img_session.run(["unnorm_image_features"], {"image": image.cpu().numpy()})[0]  # 未归一化的图片特征
+    image_features = torch.tensor(image_features)
+    image_features /= image_features.norm(dim=-1, keepdim=True)  # 归一化后的Chinese-CLIP图像特征，用于下游任务
+    print("image_features:", image_features.shape)
+    # 将二维张量转换为一维
+    image_features = image_features.squeeze()
+    vector = image_features.tolist()
+    return vector
 
 def search_by_image(image_path, top_k=5):
     """以图搜图"""
@@ -59,10 +90,18 @@ def search_by_text_vertor(query_text, top_k=5):
     :param top_k:
     :return:
     """
-    text = clip.tokenize(query_text.split(",")).to(device)
-    text_features = model.encode_text(text)
-    text_features /= text_features.norm(dim=-1, keepdim=True)
-    vector = text_features.detach().squeeze().cpu().numpy().astype(float).tolist()
+    text = cn_clip.clip.tokenize(query_text.split(","), context_length=52)
+    text_features = []
+    for i in range(len(text)):
+        one_text = np.expand_dims(text[i].cpu().numpy(), axis=0)
+        text_feature = txt_session.run(["unnorm_text_features"], {"text": one_text})[0]  # 未归一化的文本特征
+        text_feature = torch.tensor(text_feature)
+        text_features.append(text_feature)
+    text_features = torch.squeeze(torch.stack(text_features), dim=1)  # 多个特征向量stack到一起
+    text_features = text_features / text_features.norm(dim=1, keepdim=True)  # 归一化后的Chinese-CLIP文本特征，用于下游任务
+    # 将二维张量转换为一维
+    image_features = text_features.squeeze()
+    vector = image_features.tolist()
     query = {
         "query": {
             "knn": {
