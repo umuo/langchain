@@ -6,8 +6,8 @@ from langchain.callbacks import StdOutCallbackHandler
 from langchain.schema.runnable import RunnableConfig
 
 llm = OllamaLLM(
-    model="qwen2.5:7b",
-    base_url="http://10.118.21.135:11434",
+    model="qwen2.5",
+    base_url="https://champion-termite-mutually.ngrok-free.app",
     temperature=0.7,  # 控制输出的随机性
     max_tokens=150,  # 限制输出的最大标记数
     top_p=0.9,  # 用于核采样的概率阈值
