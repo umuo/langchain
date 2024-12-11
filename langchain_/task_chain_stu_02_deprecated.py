@@ -1,5 +1,5 @@
 # --coding: utf-8--
-from base_llm import llm
+from base.base_llm import llm
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.chains import SequentialChain

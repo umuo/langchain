@@ -2,7 +2,8 @@
 
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add project root to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from base.base_llm import llama_index_ollama, ollama_embedding
 from llama_index.core.query_engine import NLSQLTableQueryEngine
 from database_operate_sample import sql_database, table_name
@@ -16,4 +17,3 @@ query_engine = NLSQLTableQueryEngine(
 
 response = query_engine.query("哪个城市最受欢迎？")
 print(response)
-

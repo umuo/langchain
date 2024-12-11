@@ -3,10 +3,10 @@ import sys
 
 # 将当前脚本的父目录的父目录添加到 Python 的搜索路径中
 # 这样可以导入父目录的父目录中的模块，例如这里的 base.base_llm
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # 从 base.base_llm 模块中导入 llm (可能是一个自定义的大语言模型实例)
-from base.base_llm import llm
+from base.base_llm import llm, ollama_embedding
 # 从 llama_index.embeddings.ollama 模块中导入 OllamaEmbedding 类
 # 用于创建基于 Ollama 的文本嵌入模型
 from llama_index.embeddings.ollama import OllamaEmbedding
@@ -18,13 +18,13 @@ from llama_index.core import SimpleDirectoryReader
 from llama_index.core import VectorStoreIndex, StorageContext, load_index_from_storage
 
 # 创建一个 OllamaEmbedding 实例，用于生成文本嵌入
-embedding_model = OllamaEmbedding(
-    model_name="qwen2:7b",  # 指定使用的 Ollama 模型名称
-    base_url="http://10.118.21.135:11434",  # 指定 Ollama 服务的 URL
-)
+# embedding_model = OllamaEmbedding(
+#     model_name="qwen2:7b",  # 指定使用的 Ollama 模型名称
+#     base_url="http://10.118.21.135:11434",  # 指定 Ollama 服务的 URL
+# )
 
 # 指定要处理的数据文件路径
-data_dir = r"E:\DeskTop\tmp\1.txt"
+data_dir = r"files/news.txt"
 # 使用 SimpleDirectoryReader 加载指定文件中的数据
 documents = SimpleDirectoryReader(input_files=[data_dir]).load_data()
 # 打印加载的文档数量和数据目录
@@ -33,7 +33,7 @@ print(f"Loaded {len(documents)} documents from {data_dir}")
 # 使用 VectorStoreIndex.from_documents 方法构建向量存储索引
 # documents: 要索引的文档列表
 # embed_model: 用于生成文档嵌入的嵌入模型
-index = VectorStoreIndex.from_documents(documents, embed_model=embedding_model)
+index = VectorStoreIndex.from_documents(documents, embed_model=ollama_embedding)
 # 打印索引构建成功的消息
 print("Index built successfully")
 
@@ -48,7 +48,7 @@ print(f"Index saved to {index_dir}")
 # 从指定目录加载存储上下文
 storage_context = StorageContext.from_defaults(persist_dir=index_dir)
 # 从存储上下文加载索引，并指定嵌入模型
-loaded_index = load_index_from_storage(storage_context, embed_model=embedding_model)
+loaded_index = load_index_from_storage(storage_context, embed_model=ollama_embedding)
 
 # 使用加载的索引创建查询引擎，并指定大语言模型 (llm)
 query_engine = loaded_index.as_query_engine(llm=llm)

@@ -1,5 +1,5 @@
 # --coding: utf-8--
-from base_llm import llm
+from base.base_llm import llm
 # from langchain.chains import LLMChain  # api废弃，但还可用
 from langchain.schema.runnable import RunnableSequence
 from langchain.prompts import PromptTemplate

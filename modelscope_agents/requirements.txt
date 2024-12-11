@@ -1,0 +1,1 @@
+modelscope_agent==0.7.2
