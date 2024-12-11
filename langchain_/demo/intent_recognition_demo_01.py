@@ -2,9 +2,7 @@
 """
 意图识别，并调用对应意图的function
 """
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_llm import llm
+from base.base_llm import llm
 from langchain.schema.runnable import RunnableSequence
 from langchain.prompts import PromptTemplate
 import re

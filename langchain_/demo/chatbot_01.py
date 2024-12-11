@@ -2,10 +2,7 @@
 基于langchain实现的带有记忆的聊天机器人
 """
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_llm import llm
+from base.base_llm import llm
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.schema.runnable import RunnableSequence, RunnablePassthrough
 from langchain.prompts import ChatPromptTemplate
