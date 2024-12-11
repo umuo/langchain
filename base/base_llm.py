@@ -4,6 +4,18 @@
 from langchain_ollama import OllamaLLM
 from langchain.callbacks import StdOutCallbackHandler
 from langchain.schema.runnable import RunnableConfig
+from llama_index.embeddings.ollama import OllamaEmbedding
+from llama_index.llms.ollama import Ollama
+
+ollama_embedding = OllamaEmbedding(
+    model_name="qwen2:7b",  # 指定使用的 Ollama 模型名称
+    base_url="http://10.118.21.135:11434",  # 指定 Ollama 服务的 URL
+)
+
+llama_index_ollama = Ollama(
+    model="qwen2:7b",  # 指定使用的 Ollama 模型名称
+    base_url="http://10.118.21.135:11434",  # 指定 Ollama 服务的 URL
+)
 
 llm = OllamaLLM(
     model="qwen2:7b",
