@@ -1,5 +1,8 @@
 # LlamaIndex (原名： GPT Index)
 
+https://docs.llamaindex.ai/en/stable/understanding/using_llms/using_llms/
+文档官网可以通过LLM询问
+
 LlamaIndex (原名： GPT Index) 是一个工具库，帮助开发者创建和管理大型语言模型 (LLM) 索引，以便更好地处理和查询大型语言模型的输出。主要目标是让LLM能够高效地访问和处理大量结构化或非结构化数据，如文档、数据库、API等，从而构建强大的信息检索和问答系统。
 
 ## 主要功能

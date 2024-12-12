@@ -1,6 +1,9 @@
 
 # Langchain
 
+https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.base.RunnableSequence.html
+文档官网
+
 ## 核心组件
 
 ### PromptTemplate
