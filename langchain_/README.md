@@ -4,9 +4,96 @@
 https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.base.RunnableSequence.html
 文档官网
 
+## 核心概念
+
+### 事件流
+
+事件流是 LangChain 的核心概念，它是一个用于描述和跟踪 LangChain 中的事件的数据结构，包括事件的类型、时间戳、数据、错误信息等。几个阶段：
+1. 事件流的版本：v1（默认）：较旧的格式，事件结构相对简单
+2. 事件流的版本：v2：新版本格式，提供更详细的事件信息，包括：run_id：唯一运行标识符
+parent_ids：父运行的标识符（用于跟踪嵌套调用）
+tags：事件标签
+metadata：额外元数据
+
+```json
+[
+    {
+        "event": "on_chain_start",
+        "data": {
+            "input": "hello"
+        },
+        "name": "reverse",
+        "tags": [],
+        "run_id": "6736561a-bdc3-44eb-9c76-ef7657797d0c",
+        "metadata": {},
+        "parent_ids": []
+    },
+    {
+        "event": "on_chain_stream",
+        "run_id": "6736561a-bdc3-44eb-9c76-ef7657797d0c",
+        "name": "reverse",
+        "tags": [],
+        "metadata": {},
+        "data": {
+            "chunk": "olleh"
+        },
+        "parent_ids": []
+    },
+    {
+        "event": "on_chain_end",
+        "data": {
+            "output": "olleh"
+        },
+        "run_id": "6736561a-bdc3-44eb-9c76-ef7657797d0c",
+        "name": "reverse",
+        "tags": [],
+        "metadata": {},
+        "parent_ids": []
+    }
+]
+```
+- on_chain_start: 表示开始执行链式调用
+- on_chain_stream: 表示中间结果
+- on_chain_end: 表示结束执行链式调用
+
+例如：astream_events 这个方法，是RunnableInterface的一个实现，用于返回事件流
+
 ## 核心组件
 
-### PromptTemplate
+### Prompts
+| 类名 | 描述 |
+| --- | --- |
+BasePromptTemplate | 提供基本的Prompt模板，用于生成Prompt字符串。 |
+AIMessagePromptTemplate | 提供基于AI消息的Prompt模板，用于生成Prompt字符串。 |
+BaseChatPromptTemplate | 提供基于对话的Prompt模板，用于生成Prompt字符串。 |
+BaseMessagePromptTemplate | 提供基于消息的Prompt模板，用于生成Prompt字符串。 |
+BaseStringMessagePromptTemplate | 提供基于字符串消息的Prompt模板，用于生成Prompt字符串。 |
+ChatMessagePromptTemplate | 提供基于对话消息的Prompt模板，用于生成Prompt字符串。 |
+ChatPromptTemplate | 提供基于对话的Prompt模板，用于生成Prompt字符串。 |
+HumanMessagePromptTemplate | 提供基于人类消息的Prompt模板，用于生成Prompt字符串。 |
+MessagesPlaceholder | 提供一个占位符，用于在Prompt中插入消息列表。 |
+SystemMessagePromptTemplate | 提供基于系统消息的Prompt模板，用于生成Prompt字符串。 |
+FewShotChatMessagePromptTemplate | 提供基于对话消息的少数例子Prompt模板，用于生成Prompt字符串。 |
+FewShotPromptTemplate | 提供基于少数例子的Prompt模板，用于生成Prompt字符串。 |
+FewShotPromptWithTemplates | 提供基于少数例子的Prompt模板，用于生成Prompt字符串。 |
+ImagePromptTemplate | 提供基于图像的Prompt模板，用于生成Prompt字符串。 |
+PromptTemplate | 提供基本的Prompt模板，用于生成Prompt字符串。 |
+StringPromptTemplate | 提供基于字符串的Prompt模板，用于生成Prompt字符串。 |
+StructuredPrompt | 提供基于结构化数据的Prompt模板，用于生成Prompt字符串。 |
+aformat_document | 将文档格式化为指定的格式，并返回格式化后的文本。 |
+format_document | 将文档格式化为指定的格式，并返回格式化后的文本。 |
+load_prompt | 加载Prompt，用于生成Prompt字符串。 |
+load_prompt_from_config | 加载Prompt，用于生成Prompt字符串。 |
+check_valid_template | 检查模板是否有效，并返回结果。 |
+get_template_variables | 获取模板中的变量，并返回结果。 |
+jinja2_formatter | 使用Jinja2格式化文本，并返回格式化后的文本。 |
+mustache_formatter | 使用Mustache格式化文本，并返回格式化后的文本。 |
+mustache_schema | 获取Mustache模板的schema，用于验证模板。 |
+mustache_template_vars | 获取Mustache模板的变量，用于验证模板。 |
+validate_jinja2 | 验证Jinja2模板是否有效，并返回结果。 |
+PipelinePromptTemplate | 提供基于管道的Prompt模板，用于生成Prompt字符串。 |
+
+#### PromptTemplate
 用于动态生成对LLM的输入提示
 
 ```python
@@ -17,6 +104,13 @@ prompt = ChatPromptTemplate.from_template("你好，我是{input}")
 response = llm(prompt.format(input="小王"))
 print(response)
 ```
+
+#### BasePromptTemplate
+基类，用于定义PromptTemplate，可以被继承，实现自定义的PromptTemplate
+> BasePromptTemplate 实现了标准的 Runnable 接口。 🏃
+Runnable 接口拥有额外的方法，例如 with_types、with_retry、assign、bind、get_graph 等，可以在可运行对象上使用。
+
+
 
 ### Chains
 将多个步骤组合在一起，构成一个流畅的处理管道，用于处理复杂的任务。

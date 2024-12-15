@@ -4,3 +4,4 @@ __py_cache__
 *.pyc
 tmp
 index_data
+.DS_Store
