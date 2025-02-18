@@ -6,20 +6,23 @@ from langchain.callbacks import StdOutCallbackHandler
 from langchain.schema.runnable import RunnableConfig
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.llms.ollama import Ollama
+import httpx
 
 ollama_embedding = OllamaEmbedding(
     model_name="qwen2:7b",  # 指定使用的 Ollama 模型名称
-    base_url="http://192.168.0.210:11434",  # 指定 Ollama 服务的 URL
+    base_url="http://10.118.21.135:11434",  # 指定 Ollama 服务的 URL
+    ollama_additional_kwargs={"timeout": 120.0}  # 设置超时时间为 120 秒
 )
 
 llama_index_ollama = Ollama(
     model="qwen2:7b",  # 指定使用的 Ollama 模型名称
-    base_url="http://192.168.0.210:11434",  # 指定 Ollama 服务的 URL
+    base_url="http://10.118.21.135:11434",  # 指定 Ollama 服务的 URL
+    client=httpx.Client(timeout=60),
 )
 
 llm = OllamaLLM(
     model="qwen2:7b",
-    base_url="http://192.168.0.210:11434",
+    base_url="http://10.118.21.135:11434",
     temperature=0.7,  # 控制输出的随机性
     max_tokens=150,  # 限制输出的最大标记数
     top_p=0.9,  # 用于核采样的概率阈值
