@@ -5,3 +5,4 @@ __py_cache__
 tmp
 index_data
 .DS_Store
+.env.local
