@@ -6,3 +6,5 @@ tmp
 index_data
 .DS_Store
 .env.local
+.vscode
+temp
