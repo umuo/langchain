@@ -1,6 +1,7 @@
 from langchain_community.document_loaders import UnstructuredMarkdownLoader, Docx2txtLoader
 import tiktoken
 from typing import Iterable, List, Optional
+
 """
 dify的逻辑：
 1、首先将文档根据 '\n\n' 进行split
@@ -11,6 +12,8 @@ dify的逻辑：
 6、以上为 父文档的splitter
 7、遍历每个父文档，分别再进行splitter
 """
+
+
 def computer_token(text: str, model: str = "gpt2") -> int:
     """
     计算文本的token数量
@@ -27,7 +30,8 @@ def computer_token(text: str, model: str = "gpt2") -> int:
     return len(tokens)
 
 
-def split_and_merge_by_chunk_size(texts: list[str], chunk_size: int, separators: list[str] = ["。", ". ", " ", ""]) -> list[str]:
+def split_and_merge_by_chunk_size(texts: list[str], chunk_size: int, separators: list[str] = ["。", ". ", " ", ""]) -> \
+        list[str]:
     """
     将文本列表按照chunk_size进行分割和合并
     Args:
@@ -40,18 +44,18 @@ def split_and_merge_by_chunk_size(texts: list[str], chunk_size: int, separators:
     result = []
     temp_chunk = []
     current_tokens = 0
-    
+
     def merge_chunks(chunks: list[str], separator: str) -> None:
         nonlocal temp_chunk, current_tokens, result
         if not chunks:
             return
-            
+
         # 将当前累积的chunk添加到结果中
         if temp_chunk:
             result.append(separator.join(temp_chunk))
             temp_chunk = []
             current_tokens = 0
-            
+
         # 处理新的chunks
         for chunk in chunks:
             chunk_tokens = computer_token(chunk)
@@ -67,7 +71,7 @@ def split_and_merge_by_chunk_size(texts: list[str], chunk_size: int, separators:
                 potential_chunk = temp_chunk + [chunk] if temp_chunk else [chunk]
                 potential_text = separator.join(potential_chunk)
                 potential_tokens = computer_token(potential_text)
-                
+
                 if potential_tokens <= chunk_size:
                     temp_chunk = potential_chunk
                     current_tokens = potential_tokens
@@ -77,19 +81,21 @@ def split_and_merge_by_chunk_size(texts: list[str], chunk_size: int, separators:
                         result.append(separator.join(temp_chunk))
                     temp_chunk = [chunk]
                     current_tokens = chunk_tokens
-    
+
     # 处理主文本列表
     merge_chunks(texts, separators[0])
-    
+
     # 处理最后剩余的temp_chunk
     if temp_chunk:
         result.append(separators[0].join(temp_chunk))
-    
+
     return result
+
 
 def _length_function(splits: list[str]) -> list[int]:
     """Calculate the token length of each split."""
     return [computer_token(s) for s in splits]
+
 
 def _join_docs(docs: list[str], separator: str) -> Optional[str]:
     text = separator.join(docs)
@@ -99,11 +105,13 @@ def _join_docs(docs: list[str], separator: str) -> Optional[str]:
     else:
         return text
 
+
 global _chunk_size, _fixed_separator
 _fixed_separator = "\n"
 _chunk_size = 500
 _chunk_overlap = 0
 _separators = ["\n\n", "。", ". ", " ", ""]
+
 
 def _merge_splits(splits: Iterable[str], separator: str, lengths: list[int]) -> list[str]:
     # We now want to combine these smaller pieces into medium size
@@ -129,7 +137,7 @@ def _merge_splits(splits: Iterable[str], separator: str, lengths: list[int]) -> 
                 # - we have a larger chunk than in the chunk overlap
                 # - or if we still have any chunks and the length is long
                 while total > _chunk_overlap or (
-                    total + _len + (separator_len if len(current_doc) > 0 else 0) > _chunk_size and total > 0
+                        total + _len + (separator_len if len(current_doc) > 0 else 0) > _chunk_size and total > 0
                 ):
                     total -= _length_function([current_doc[0]])[0] + (
                         separator_len if len(current_doc) > 1 else 0
@@ -142,6 +150,8 @@ def _merge_splits(splits: Iterable[str], separator: str, lengths: list[int]) -> 
     if doc is not None:
         docs.append(doc)
     return docs
+
+
 def recursive_split_text(text: str) -> list[str]:
     """Split incoming text and return chunks."""
     final_chunks = []
@@ -179,9 +189,7 @@ def recursive_split_text(text: str) -> list[str]:
         merged_text = _merge_splits(_good_splits, separator, _good_splits_lengths)
         final_chunks.extend(merged_text)
     return final_chunks
-loader = Docx2txtLoader(
-    r"/Users/gitsilence/Documents/弘扬传统文化.docx"
-)
+
 
 def split_text(text: str) -> list[str]:
     """Split incoming text and return chunks."""
@@ -198,6 +206,16 @@ def split_text(text: str) -> list[str]:
         else:
             final_chunks.append(chunk)
     return final_chunks
+
+
+# loader = Docx2txtLoader(
+#     r"/Users/gitsilence/Documents/弘扬传统文化.docx"
+# )
+
+loader = UnstructuredMarkdownLoader(
+    r"E:\DeskTop\deep_research_test_data.md"
+)
+
 documents = loader.load()
 # print(documents)
 print(f"加载了 {len(documents)} 个文档")
