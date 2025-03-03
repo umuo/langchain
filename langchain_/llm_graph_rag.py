@@ -1,13 +1,13 @@
 # --coding: utf-8--
 from langchain_community.graphs.nebula_graph import NebulaGraph
-from langchain.chains import NebulaGraphQAChain
+from langchain_community.chains.graph_qa.nebulagraph import NebulaGraphQAChain
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
 
 # 按优先级依次加载配置文件
-load_dotenv('.env', override=True)            # 最低优先级
-load_dotenv('.env.local', override=True)      # 最高优先级
+load_dotenv('../.env', override=True)            # 最低优先级
+load_dotenv('../.env.local', override=True)      # 最高优先级
 
 API_KEY = os.getenv("OPENAI_API_KEY")
 BASE_URL = os.getenv("OPENAI_BASE_URL")
@@ -30,13 +30,11 @@ print(graph_db.get_schema)
 
 qa_chain = NebulaGraphQAChain.from_llm(
     llm=llm,
-    graph_db=graph_db,
-    verbose=True,
+    graph=graph_db,
+    verbose=True,  # 开启详细输出，便于调试
+    allow_dangerous_requests=True  # 明确确认风险
 )
-question = "介绍下哪吒的关系网"
-result = qa_chain.run({
-    "input": question
-})
-print(result)
-
-
+question = "查询下所有人物"
+result = qa_chain.invoke({"query": question})
+for k,v in result.items():
+    print(k, ": ", v)
