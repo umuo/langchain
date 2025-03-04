@@ -40,6 +40,8 @@ docx2txt = "^0.8"
 markupsafe = "2.0.1"
 uvicorn = "^0.34.0"
 weaviate-client = "3.21.0"
+clickhouse-driver = "^0.2.9"
+pymilvus = "^2.5.4"
 
 
 [build-system]
