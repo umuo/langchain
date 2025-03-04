@@ -38,6 +38,8 @@ langchain-chroma = "^0.2.2"
 langchain-experimental = "^0.3.4"
 docx2txt = "^0.8"
 markupsafe = "2.0.1"
+uvicorn = "^0.34.0"
+weaviate-client = "3.21.0"
 
 
 [build-system]
