@@ -3,7 +3,9 @@ from weaviate.auth import AuthCredentials
 from typing import Optional, Dict, Any
 import uuid
 from langchain_ollama import OllamaEmbeddings
-
+"""
+pip install weaviate-client==3.21.0
+"""
 
 # 创建Ollama Embeddings实例
 def create_embeddings():
