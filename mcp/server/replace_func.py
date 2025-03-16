@@ -7,6 +7,9 @@ from pydantic import FileUrl
 import httpx
 server = Server("test_replace_func")
 
+"""
+MCP 服务端示例
+"""
 
 SAMPLE_RESOURCES = {
     "greeting": "Hello! This is a sample text resource.",
@@ -16,13 +19,15 @@ SAMPLE_RESOURCES = {
 
 
 async def fetch_website(url: str) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
+    print("fetching website: ", url)
     headers = {
         "User-Agent": "MCP Test Server (github.com/modelcontextprotocol/python-sdk)"
     }
     async with httpx.AsyncClient(follow_redirects=True, headers=headers) as client:
         response = await client.get(url)
+        print(response.text)
         if response.status_code == 200:
-            if response.headers["Content-Type"].startswith("text/"):
+            if response.headers["Content-Type"].startswith(("text/html", "text/plain", "application/json", "application/javascript")):
                 return [types.TextContent(
                     type="text",
                     text=response.text
@@ -36,6 +41,18 @@ async def fetch_website(url: str) -> list[types.TextContent | types.ImageContent
                     data=image_base64,
                     mimeType=response.headers["Content-Type"]
                 )]
+            else:
+                # 处理其他内容类型，返回一个包含错误信息的文本内容
+                return [types.TextContent(
+                    type="text",
+                    text=f"不支持的内容类型: {response.headers['Content-Type']}, {str(response.text)}"
+                )]
+        else:
+            # 处理请求失败的情况
+            return [types.TextContent(
+                type="text",
+                text=f"请求失败，状态码: {response.status_code}"
+            )]
 
 
 @server.list_tools()
@@ -142,6 +159,7 @@ async def handle_get_prompt(
 
 
 async def run(transport: str):
+    print("transport: ", transport)
     if transport != 'sse':
         async with mcp.server.stdio.stdio_server() as (read, write):
             await server.run(
@@ -194,4 +212,4 @@ async def run(transport: str):
 
 if __name__ == '__main__':
     import asyncio
-    asyncio.run(run("sse"))
+    asyncio.run(run("stdio"))

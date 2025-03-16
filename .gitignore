@@ -8,3 +8,4 @@ index_data
 .env.local
 .vscode
 temp
+.idea
