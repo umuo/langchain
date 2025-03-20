@@ -59,8 +59,8 @@ async def fetch_website(url: str) -> list[types.TextContent | types.ImageContent
 async def list_tools() -> list[types.Tool]:
     return [
         types.Tool(
-            name="示例工具",
-            description="这是一个示例工具",
+            name="获取网页内容",
+            description="这是用来获取网页中内容的工具",
             inputSchema={
                 "type": "object",
                 "required": ["url"],
@@ -77,7 +77,7 @@ async def list_tools() -> list[types.Tool]:
 
 @server.call_tool()
 async def fetch_web_tool(name: str, arguments: dict) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
-    if name != "示例工具":
+    if name != "获取网页内容":
         raise ValueError(f"未找到对应的工具: {name}")
     if "url" not in arguments:
         raise ValueError("Missing required argument 'url'")
@@ -212,4 +212,4 @@ async def run(transport: str):
 
 if __name__ == '__main__':
     import asyncio
-    asyncio.run(run("stdio"))
+    asyncio.run(run("sse"))
