@@ -1,8 +1,8 @@
 from langchain.prompts import PromptTemplate
 from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
-from tools.tools_01 import calculator
+from tools_01 import calculator
 from langchain.callbacks.base import BaseCallbackHandler
-from base_llm import llm
+from base.base_llm import llm
 from langchain.chains import LLMChain
 # ZeroShotAgent是一个基于提示模板的代理，用于生成响应。
 class ScratchpadCallbackHandler(BaseCallbackHandler):
