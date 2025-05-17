@@ -59,7 +59,7 @@ async def fetch_website(url: str) -> list[types.TextContent | types.ImageContent
 async def list_tools() -> list[types.Tool]:
     return [
         types.Tool(
-            name="获取网页内容",
+            name="get_web_content",
             description="这是用来获取网页中内容的工具",
             inputSchema={
                 "type": "object",
@@ -190,7 +190,7 @@ async def run(transport: str):
                     read_stream=read,
                     write_stream=write,
                     initialization_options=InitializationOptions(
-                        server_name="example-server",
+                        server_name="web_tool_server",
                         server_version="1.0.0",
                         capabilities=server.get_capabilities(
                             notification_options=NotificationOptions(),
