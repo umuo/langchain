@@ -9,8 +9,9 @@ from llama_index.llms.ollama import Ollama
 import httpx
 from dotenv import load_dotenv
 import os
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.local'))
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.local'), override=True)
 
 OLLAMA_CHAT_MODEL = os.getenv("OLLAMA_CHAT_MODEL")
 OLLAMA_URL = os.getenv("OLLAMA_URL")
@@ -38,6 +39,19 @@ llm = OllamaLLM(
     top_p=0.9,  # 用于核采样的概率阈值
     frequency_penalty=0.5,  # 降低频繁使用的词的概率
     presence_penalty=0.5,  # 鼓励模型使用新的词
+)
+
+autogen_llm = OpenAIChatCompletionClient(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_BASE_URL"),
+    model=os.getenv("CHAT_MODEL_NAME"),
+    model_info={
+        "json_output": False,
+        "vision": False,
+        "function_calling": True,
+        "family": "unknown",
+        "structured_output": False,
+    }
 )
 
 # response = llm.invoke("你是谁")
